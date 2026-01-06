@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import AdminLayout from "./components/pages/AdminLayout"
 import Dashboard from "./components/Dashboard";
 import Crud from "./components/Crud";
+import App from "./App";
 
 const router = createBrowserRouter([
 	{
@@ -17,7 +18,12 @@ const router = createBrowserRouter([
 				element: <Crud />,
 			},
 		],
+	
 	},
+	{
+		path: "/app",
+		element: <App />,
+	}
 ]);
 
 export default router;
