@@ -8,6 +8,8 @@ export default {
     extend: {
       fontFamily: {
 				inter: ["Inter", "sans-serif"],
+				geist: ["Geist", "sans-serif"],
+				londrina: ["Londrina Shadow", "sans-serif"],
 			},
     },
   },
