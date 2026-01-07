@@ -3,6 +3,8 @@ import AdminLayout from "./components/pages/AdminLayout"
 import Dashboard from "./components/Dashboard";
 import Crud from "./components/Crud";
 import App from "./App";
+import Sales from "./components/Sales";
+import Inventory from "./components/Inventory";
 
 const router = createBrowserRouter([
 	{
@@ -16,6 +18,14 @@ const router = createBrowserRouter([
 			{
 				path: "crud",
 				element: <Crud />,
+			},
+			{
+				path: "sales",
+				element: <Sales />,
+			},
+			{
+				path: "inventory",
+				element: <Inventory />,
 			},
 		],
 	

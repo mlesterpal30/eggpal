@@ -1,0 +1,148 @@
+CHANGES TO FIX "Unable to retrieve auto-refresh token" ERROR LOGGING
+
+================================================================================
+CHANGE 1: Remove isAccessTokenExpired check from getToken function
+================================================================================
+
+BEFORE:
+    const getToken = useCallback(async (recalculateClaims: boolean, modeledEventCode?: number) => {
+        if (!currentAccessToken.current || !refreshTokenRef.current || isAccessTokenExpired()) {
+            return undefined;
+        }
+
+        return await authenticationRepository.getRefreshedToken(refreshTokenRef.current, { accessToken: sessionHelper.accessToken, modeledEventCode, recalculateClaims });
+    }, []);
+
+AFTER:
+    const getToken = useCallback(async (recalculateClaims: boolean, modeledEventCode?: number) => {
+        if (!currentAccessToken.current || !refreshTokenRef.current) {
+            return undefined;
+        }
+
+        return await authenticationRepository.getRefreshedToken(refreshTokenRef.current, { accessToken: sessionHelper.accessToken, modeledEventCode, recalculateClaims });
+    }, []);
+
+================================================================================
+CHANGE 2: Add isAccessTokenExpired check in useInterval callback (auto-refresh)
+================================================================================
+
+BEFORE:
+    useInterval(async () => {
+        // While a forced refresh is occurring, we shouldn't be starting any new auto-refreshes
+        if (!enableAutoRefresh.current) {
+            return;
+        }
+
+        const counter = ++autoRefreshCounter.current;
+        log.trace(`Starting access token auto-refresh (${sessionHelper.authenticationMethod} - ${counter})`);
+
+        const accessToken = await getToken(false);
+
+        if (!accessToken) {
+            telemetryService.trackException(new Error("Unable to retrieve auto-refresh token"));
+            navigateTo(LOGOUT_URL);
+            return;
+        }
+
+        // The result of grabbing an access token should be ignored in the following scenarios:
+        //  1. A user is logged out, thus the current access token is undefined
+        //  2. A forced refresh occurs, thus we don't want the auto-refresh token to trump the forced refresh token
+        if (currentAccessToken.current && (counter > obsoleteAutoRefreshCounterValue.current)) {
+            log.trace(`Completing access token auto-refresh (${sessionHelper.authenticationMethod} - ${counter})`);
+            setTokenInternal(accessToken);
+        }
+        else {
+            log.trace("Skipped assigning access token auto-refresh");
+        }
+
+    }, state ? TOKEN_REFRESH_INTERVAL_SEC * 1000 : 0, false);
+
+AFTER:
+    useInterval(async () => {
+        // While a forced refresh is occurring, we shouldn't be starting any new auto-refreshes
+        if (!enableAutoRefresh.current) {
+            return;
+        }
+
+        if (isAccessTokenExpired()) {
+            navigateTo(LOGOUT_URL);
+            return;
+        }
+
+        const counter = ++autoRefreshCounter.current;
+        log.trace(`Starting access token auto-refresh (${sessionHelper.authenticationMethod} - ${counter})`);
+
+        const accessToken = await getToken(false);
+
+        if (!accessToken) {
+            navigateTo(LOGOUT_URL);
+            return;
+        }
+
+        // The result of grabbing an access token should be ignored in the following scenarios:
+        //  1. A user is logged out, thus the current access token is undefined
+        //  2. A forced refresh occurs, thus we don't want the auto-refresh token to trump the forced refresh token
+        if (currentAccessToken.current && (counter > obsoleteAutoRefreshCounterValue.current)) {
+            log.trace(`Completing access token auto-refresh (${sessionHelper.authenticationMethod} - ${counter})`);
+            setTokenInternal(accessToken);
+        }
+        else {
+            log.trace("Skipped assigning access token auto-refresh");
+        }
+
+    }, state ? TOKEN_REFRESH_INTERVAL_SEC * 1000 : 0, false);
+
+================================================================================
+CHANGE 3: Add isAccessTokenExpired check in refreshTokenInternal (forced refresh)
+================================================================================
+
+BEFORE:
+    const refreshTokenInternal = useCallback(async (recalculateClaims: boolean, modeledEventCode?: number) => {
+        enableAutoRefresh.current = false;
+        obsoleteAutoRefreshCounterValue.current = autoRefreshCounter.current;
+
+        const accessToken = await getToken(recalculateClaims, modeledEventCode);
+
+        if (!accessToken) {
+            telemetryService.trackException(new Error("Unable to retrieve forced-refresh token"));
+            navigateTo(LOGOUT_URL);
+            return undefined;
+        }
+
+        setTokenInternal(accessToken);
+
+        enableAutoRefresh.current = true;
+    }, [getToken, LOGOUT_URL, navigateTo, setTokenInternal]);
+
+AFTER:
+    const refreshTokenInternal = useCallback(async (recalculateClaims: boolean, modeledEventCode?: number) => {
+        enableAutoRefresh.current = false;
+        obsoleteAutoRefreshCounterValue.current = autoRefreshCounter.current;
+
+        if (isAccessTokenExpired()) {
+            navigateTo(LOGOUT_URL);
+            return undefined;
+        }
+
+        const accessToken = await getToken(recalculateClaims, modeledEventCode);
+
+        if (!accessToken) {
+            navigateTo(LOGOUT_URL);
+            return undefined;
+        }
+
+        setTokenInternal(accessToken);
+
+        enableAutoRefresh.current = true;
+    }, [getToken, LOGOUT_URL, navigateTo, setTokenInternal]);
+
+================================================================================
+SUMMARY
+================================================================================
+
+1. Removed `isAccessTokenExpired()` check from `getToken` function
+2. Added `isAccessTokenExpired()` check in `useInterval` callback before calling `getToken`
+3. Added `isAccessTokenExpired()` check in `refreshTokenInternal` before calling `getToken`
+4. Removed `telemetryService.trackException()` calls that were logging "Unable to retrieve auto-refresh token" and "Unable to retrieve forced-refresh token" errors
+5. Now when token is expired, user is logged out silently without error logging
+
