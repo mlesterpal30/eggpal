@@ -5,6 +5,8 @@ import Navbar from "../Navbar";
 import Sidebar from "../Sidebar";
 import { FaChartBar } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
+import { BsCashCoin } from "react-icons/bs";
+import { FaBox } from "react-icons/fa";
 
 const AdminLayout = () => {
     // Initialize sidebar as open on large screens, closed on small screens
@@ -19,9 +21,14 @@ const AdminLayout = () => {
             icon: <FaChartBar />,
         },
         {
-            name: "Crud",
-            path: "/crud",
-            icon: <FaUser />,
+            name: "Sales",
+            path: "/sales",
+            icon: <BsCashCoin />,
+        },
+        {
+            name: "Inventory",
+            path: "/inventory",
+            icon: <FaBox />,
         },
     ];
 

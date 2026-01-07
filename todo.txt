@@ -1,0 +1,15 @@
+Report 
+- add dashboard box for total sales
+- add dashboard box for inventory per size
+- check if the dasbhoard is accurate when data table change
+
+Inventory
+- ✅ create function for creating record for harvesting today
+- add toas handle to make user knwo what is the error
+- add filter based on who harvest by
+- add filter based on specific date
+
+Sales 
+- add filter on sales table based on transacted by
+- add toast handler to make user know what is the error
+- add filter based on specific date

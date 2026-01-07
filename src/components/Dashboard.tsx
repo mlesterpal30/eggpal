@@ -77,6 +77,7 @@ const Dashboard = () => {
 
     const [selectedMonth, setSelectedMonth] = useState<number | null>(currentMonth);
     const [selectedYear, setSelectedYear] = useState<number | null>(currentYear);
+    
 
     const { data, isLoading, error } = useGetReportHarvestBy(selectedMonth, selectedYear);
     const report = data?.results;
@@ -93,6 +94,7 @@ const Dashboard = () => {
         const value = e.target.value;
         setSelectedYear(value === "" ? null : parseInt(value));
     };
+
 
     const getChartTitle = () => {
         let title = "Egg Harvest Report";
@@ -299,14 +301,30 @@ const Dashboard = () => {
 
     // ==================== Sales Report ====================
     const { data: salesReportData, isLoading: isSalesReportLoading, error: salesReportError } = useGetSalesReportByMonth();
+    // Sales Report year selector
+    const [selectedSalesYear, setSelectedSalesYear] = useState<number | null>(currentYear);
+
+    const handleSalesYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        setSelectedSalesYear(value === "" ? null : parseInt(value));
+    };
+    // Filter sales report data by selected year
+    const filteredSalesReportData = salesReportData?.filter((item) => 
+        selectedSalesYear === null || item.year === selectedSalesYear
+    ) || [];
+
+    // Get available years from sales report data for the year selector
+    const availableSalesYears = salesReportData 
+        ? Array.from(new Set(salesReportData.map((item) => item.year))).sort((a, b) => b - a)
+        : [];
 
     // Sales Report - Chart Data & Options
-    const salesChartData = salesReportData && salesReportData.length > 0 ? {
-        labels: salesReportData.map((item) => item.month),
+    const salesChartData = filteredSalesReportData && filteredSalesReportData.length > 0 ? {
+        labels: filteredSalesReportData.map((item) => item.month),
         datasets: [
             {
                 label: "Small",
-                data: salesReportData.map((item) => item.small),
+                data: filteredSalesReportData.map((item) => item.small),
                 borderColor: "rgba(54, 162, 235, 1)",
                 backgroundColor: "rgba(54, 162, 235, 0.1)",
                 borderWidth: 2,
@@ -317,7 +335,7 @@ const Dashboard = () => {
             },
             {
                 label: "Medium",
-                data: salesReportData.map((item) => item.medium),
+                data: filteredSalesReportData.map((item) => item.medium),
                 borderColor: "rgba(75, 192, 192, 1)",
                 backgroundColor: "rgba(75, 192, 192, 0.1)",
                 borderWidth: 2,
@@ -328,7 +346,7 @@ const Dashboard = () => {
             },
             {
                 label: "Large",
-                data: salesReportData.map((item) => item.large),
+                data: filteredSalesReportData.map((item) => item.large),
                 borderColor: "rgba(255, 159, 64, 1)",
                 backgroundColor: "rgba(255, 159, 64, 0.1)",
                 borderWidth: 2,
@@ -390,7 +408,9 @@ const Dashboard = () => {
             },
             title: {
                 display: true,
-                text: "Total Sales by Month",
+                text: selectedSalesYear 
+                    ? `Total Sales by Month - ${selectedSalesYear}`
+                    : "Total Sales by Month",
             },
         },
         scales: {
@@ -472,7 +492,7 @@ const Dashboard = () => {
 
                 {/* Egg Production by Month Report */}
                 <Box bg="white" p={6} borderRadius="md" boxShadow="md">
-                    <Box h="400px">
+                     <Box h="400px">
                         {isEggProductionLoading ? (
                             <Box display="flex" justifyContent="center" alignItems="center" h="100%">
                                 <Spinner size="xl" />
@@ -524,6 +544,22 @@ const Dashboard = () => {
 
                 {/* Sales Report */}
                 <Box bg="white" p={6} borderRadius="md" boxShadow="md">
+                    <Box mb={6}>
+                        <FormControl width="150px">
+                            <FormLabel>Year</FormLabel>
+                            <Select
+                                value={selectedSalesYear ?? ""}
+                                onChange={handleSalesYearChange}
+                            >
+                                <option value="">All Years</option>
+                                {availableSalesYears.map((year) => (
+                                    <option key={year} value={year}>
+                                        {year}
+                                    </option>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Box>
                     <Box h="400px">
                         {isSalesReportLoading ? (
                             <Box display="flex" justifyContent="center" alignItems="center" h="100%">
@@ -539,6 +575,10 @@ const Dashboard = () => {
                         ) : !salesReportData || salesReportData.length === 0 ? (
                             <Box display="flex" justifyContent="center" alignItems="center" h="100%">
                                 <Text fontSize="lg" color="gray.500">No data available</Text>
+                            </Box>
+                        ) : filteredSalesReportData.length === 0 ? (
+                            <Box display="flex" justifyContent="center" alignItems="center" h="100%">
+                                <Text fontSize="lg" color="gray.500">No data available for the selected year</Text>
                             </Box>
                         ) : (
                             <Line data={salesChartData} options={salesChartOptions} />
