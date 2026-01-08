@@ -4,12 +4,14 @@ import APIClient, { FetchResponse } from "../services/apiClient";
 import { ReportEggProduction } from "../entiies/Report/ReportEggProduction";
 import { EggInventoryTotalQuantityReport } from "../entiies/Report/EggInventoryTotalQuantityReport";
 import { SalesReport } from "../entiies/Report/SalesReport";
+import { TotalSalesReport } from "../entiies/Report/TotalSalesReport";
 
 
 const getReportHarvestBy = new APIClient<ReportHaravestBy>("/Report/harvestby");
 const getReportEggProduction = new APIClient<ReportEggProduction>("/Report/eggproduction");
 const getEggInventoryTotalQuantityReport = new APIClient<EggInventoryTotalQuantityReport>("/Report/egginventorytotalquantity");
 const getSalesReportByMonth = new APIClient<SalesReport>("/Report/salesreport-by-month");
+const getTotalSalesReport = new APIClient<TotalSalesReport>("/Report/totalsales");
 
 export const useGetReportHarvestBy = (month?: number | null, year?: number | null) => {
     return useQuery<FetchResponse<ReportHaravestBy>, Error>({
@@ -66,3 +68,13 @@ export const useGetSalesReportByMonth = () => {
         },
     });
 };
+
+export const useGetTotalSalesReport = () => {
+    return useQuery<number, Error>({
+        queryKey: ["totalsalesreport"],
+        queryFn: async () => {
+            const response = await getTotalSalesReport.getAll();
+            return response.results as unknown as number;
+        },
+    });
+}

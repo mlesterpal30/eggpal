@@ -5,6 +5,7 @@ import Crud from "./components/Crud";
 import App from "./App";
 import Sales from "./components/Sales";
 import Inventory from "./components/Inventory";
+import Finance from "./components/Finance";
 
 const router = createBrowserRouter([
 	{
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
 			{
 				path: "inventory",
 				element: <Inventory />,
+			},
+			{
+				path: "finance",
+				element: <Finance />,
 			},
 		],
 	

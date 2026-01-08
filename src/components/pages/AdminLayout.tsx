@@ -21,8 +21,8 @@ const AdminLayout = () => {
             icon: <FaChartBar />,
         },
         {
-            name: "Sales",
-            path: "/sales",
+            name: "Finance",
+            path: "/finance",
             icon: <BsCashCoin />,
         },
         {

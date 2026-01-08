@@ -11,7 +11,10 @@ import {
     FormLabel,
     Flex,
     Grid,
+    HStack,
+    VStack,
 } from "@chakra-ui/react";
+import { MdAttachMoney, MdTrendingUp } from "react-icons/md";
 import { Bar, Pie, Line } from "react-chartjs-2";
 import {
     Chart as ChartJS,
@@ -30,6 +33,7 @@ import {
     useGetReportEggProduction,
     useGetSalesReportByMonth,
     useGetEggInventoryTotalQuantityReport,
+    useGetTotalSalesReport,
 } from "../hooks/ReportRepository";
 
 // Register Chart.js components
@@ -299,6 +303,9 @@ const Dashboard = () => {
         },
     };
 
+    // ==================== Total Sales Report ====================
+    const { data: totalSalesData, isLoading: isTotalSalesLoading, error: totalSalesError } = useGetTotalSalesReport();
+
     // ==================== Sales Report ====================
     const { data: salesReportData, isLoading: isSalesReportLoading, error: salesReportError } = useGetSalesReportByMonth();
     // Sales Report year selector
@@ -431,8 +438,60 @@ const Dashboard = () => {
     };
 
     return (
-        <Box p={6}>
+        <Box p={6} fontFamily="geist">
             <Heading mb={6}>Dashboard</Heading>
+            <Grid templateColumns="repeat(4, 1fr)" gap={6} mb={6}>
+                <Box
+                    bg="white"
+                    p={6}
+                    borderRadius="lg"
+                    boxShadow="lg"
+                    borderLeft="4px solid"
+                    borderColor="blue.500"
+                    _hover={{
+                        boxShadow: "xl",
+                        transform: "translateY(-2px)",
+                        transition: "all 0.2s",
+                    }}
+                    transition="all 0.2s"
+                >
+                    {isTotalSalesLoading ? (
+                        <Flex align="center" justify="center" h="100px">
+                            <Spinner size="lg" color="blue.500" />
+                        </Flex>
+                    ) : totalSalesError ? (
+                        <Alert status="error" borderRadius="md">
+                            <AlertIcon />
+                            <Text>Error loading total sales: {totalSalesError.message}</Text>
+                        </Alert>
+                    ) : (
+                        <HStack spacing={4} align="flex-start">
+                            <Box
+                                bg="blue.50"
+                                p={3}
+                                borderRadius="lg"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                            >
+                                <MdAttachMoney size={32} color="#3182CE" />
+                            </Box>
+                            <VStack align="flex-start" spacing={1} flex={1}>
+                                <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                                    Total Sales
+                                </Text>
+                                <Text fontSize="3xl" fontWeight="bold" color="gray.800">
+                                    {totalSalesData !== undefined ? totalSalesData.toLocaleString() : "N/A"}
+                                </Text>
+                                <HStack spacing={1} color="green.500" fontSize="sm">
+                                    <MdTrendingUp />
+                                    <Text>All time</Text>
+                                </HStack>
+                            </VStack>
+                        </HStack>
+                    )}
+                </Box>
+            </Grid>
             <Grid templateColumns="repeat(2, 1fr)" gap={6}>
                 {/* Harvest By Report */}
                 <Box bg="white" p={6} borderRadius="md" boxShadow="md">

@@ -1,15 +1,29 @@
+6 hours and 30 minutes
+
 Report 
-- add dashboard box for total sales
-- add dashboard box for inventory per size
-- check if the dasbhoard is accurate when data table change
+- ✅ add dashboard box for total sales
+- ✅ add dashboard box for inventory per size
+- ✅ check if the dasbhoard is accurate when data table change
+- make the default value of total sales per month is this year
 
 Inventory
 - ✅ create function for creating record for harvesting today
 - add toas handle to make user knwo what is the error
-- add filter based on who harvest by
+- ✅ add filter based on who harvest by
 - add filter based on specific date
+- ✅get the names unique of the harvest by then use it a select option
+- ✅fix date in table
+- add a edit funcaitonality on the inventory table action
 
+FINANCE
+-✅ make sales finance and add tab so i can change to manage to sales to expences
 Sales 
-- add filter on sales table based on transacted by
+- ✅ add filter on sales table based on transacted by
 - add toast handler to make user know what is the error
 - add filter based on specific date
+
+Notifiction
+- send a remider notif if every 7pm and still no harvest for today
+
+All 
+- updte the eggreporsitory to harvest repository

@@ -1,4 +1,4 @@
-export interface Egg {
+export interface Harvest {
     id: number;
     eggSize?: string;
     eggCount: number;
@@ -7,4 +7,4 @@ export interface Egg {
     createdAt: string;
     updatedAt: string;
   }
-  
+
