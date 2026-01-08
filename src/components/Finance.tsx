@@ -1,5 +1,6 @@
 import { TabPanel, TabList, TabIndicator, TabPanels, Tabs, Tab } from '@chakra-ui/react'
 import Sales from './Sales'
+import Expenses from './Expenses'
 import React from 'react'   
 
 const Finance = () => {
@@ -7,7 +8,7 @@ const Finance = () => {
     <Tabs position='relative' variant='unstyled'>
     <TabList>
         <Tab>Sales</Tab>
-        <Tab>Expences</Tab>
+        <Tab>Expenses</Tab>
         <Tab>Three</Tab>
     </TabList>
     <TabIndicator mt='-1.5px' height='2px' bg='blue.500' borderRadius='1px' />
@@ -16,7 +17,7 @@ const Finance = () => {
               <Sales/>
         </TabPanel>
         <TabPanel>
-        <p>two!</p>
+              <Expenses/>
         </TabPanel>
         <TabPanel>
         <p>three!</p>
