@@ -14,7 +14,7 @@ import {
     HStack,
     VStack,
 } from "@chakra-ui/react";
-import { MdAttachMoney, MdTrendingUp } from "react-icons/md";
+import { MdAttachMoney, MdTrendingUp, MdTrendingDown, MdAccountBalanceWallet } from "react-icons/md";
 import { Bar, Pie, Line } from "react-chartjs-2";
 import {
     Chart as ChartJS,
@@ -34,6 +34,8 @@ import {
     useGetSalesReportByMonth,
     useGetEggInventoryTotalQuantityReport,
     useGetTotalSalesReport,
+    useGetTotalExpensesReport,
+    useGetTotalProfitReport,
 } from "../hooks/ReportRepository";
 
 // Register Chart.js components
@@ -306,6 +308,12 @@ const Dashboard = () => {
     // ==================== Total Sales Report ====================
     const { data: totalSalesData, isLoading: isTotalSalesLoading, error: totalSalesError } = useGetTotalSalesReport();
 
+    // ==================== Total Expenses Report ====================
+    const { data: totalExpensesData, isLoading: isTotalExpensesLoading, error: totalExpensesError } = useGetTotalExpensesReport();
+
+    // ==================== Total Profit Report ====================
+    const { data: totalProfitData, isLoading: isTotalProfitLoading, error: totalProfitError } = useGetTotalProfitReport();
+
     // ==================== Sales Report ====================
     const { data: salesReportData, isLoading: isSalesReportLoading, error: salesReportError } = useGetSalesReportByMonth();
     // Sales Report year selector
@@ -482,6 +490,110 @@ const Dashboard = () => {
                                 </Text>
                                 <Text fontSize="3xl" fontWeight="bold" color="gray.800">
                                     {totalSalesData !== undefined ? totalSalesData.toLocaleString() : "N/A"}
+                                </Text>
+                                <HStack spacing={1} color="green.500" fontSize="sm">
+                                    <MdTrendingUp />
+                                    <Text>All time</Text>
+                                </HStack>
+                            </VStack>
+                        </HStack>
+                    )}
+                </Box>
+
+                {/* Total Expenses Card */}
+                <Box
+                    bg="white"
+                    p={6}
+                    borderRadius="lg"
+                    boxShadow="lg"
+                    borderLeft="4px solid"
+                    borderColor="red.500"
+                    _hover={{
+                        boxShadow: "xl",
+                        transform: "translateY(-2px)",
+                        transition: "all 0.2s",
+                    }}
+                    transition="all 0.2s"
+                >
+                    {isTotalExpensesLoading ? (
+                        <Flex align="center" justify="center" h="100px">
+                            <Spinner size="lg" color="red.500" />
+                        </Flex>
+                    ) : totalExpensesError ? (
+                        <Alert status="error" borderRadius="md">
+                            <AlertIcon />
+                            <Text>Error loading total expenses: {totalExpensesError.message}</Text>
+                        </Alert>
+                    ) : (
+                        <HStack spacing={4} align="flex-start">
+                            <Box
+                                bg="red.50"
+                                p={3}
+                                borderRadius="lg"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                            >
+                                <MdTrendingDown size={32} color="#E53E3E" />
+                            </Box>
+                            <VStack align="flex-start" spacing={1} flex={1}>
+                                <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                                    Total Expenses
+                                </Text>
+                                <Text fontSize="3xl" fontWeight="bold" color="gray.800">
+                                    {totalExpensesData !== undefined ? totalExpensesData.toLocaleString() : "N/A"}
+                                </Text>
+                                <HStack spacing={1} color="red.500" fontSize="sm">
+                                    <MdTrendingDown />
+                                    <Text>All time</Text>
+                                </HStack>
+                            </VStack>
+                        </HStack>
+                    )}
+                </Box>
+
+                {/* Total Profit Card */}
+                <Box
+                    bg="white"
+                    p={6}
+                    borderRadius="lg"
+                    boxShadow="lg"
+                    borderLeft="4px solid"
+                    borderColor="green.500"
+                    _hover={{
+                        boxShadow: "xl",
+                        transform: "translateY(-2px)",
+                        transition: "all 0.2s",
+                    }}
+                    transition="all 0.2s"
+                >
+                    {isTotalProfitLoading ? (
+                        <Flex align="center" justify="center" h="100px">
+                            <Spinner size="lg" color="green.500" />
+                        </Flex>
+                    ) : totalProfitError ? (
+                        <Alert status="error" borderRadius="md">
+                            <AlertIcon />
+                            <Text>Error loading total profit: {totalProfitError.message}</Text>
+                        </Alert>
+                    ) : (
+                        <HStack spacing={4} align="flex-start">
+                            <Box
+                                bg="green.50"
+                                p={3}
+                                borderRadius="lg"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                            >
+                                <MdAccountBalanceWallet size={32} color="#38A169" />
+                            </Box>
+                            <VStack align="flex-start" spacing={1} flex={1}>
+                                <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                                    Total Profit
+                                </Text>
+                                <Text fontSize="3xl" fontWeight="bold" color="gray.800">
+                                    {totalProfitData !== undefined ? totalProfitData.toLocaleString() : "N/A"}
                                 </Text>
                                 <HStack spacing={1} color="green.500" fontSize="sm">
                                     <MdTrendingUp />

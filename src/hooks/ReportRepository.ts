@@ -12,6 +12,8 @@ const getReportEggProduction = new APIClient<ReportEggProduction>("/Report/eggpr
 const getEggInventoryTotalQuantityReport = new APIClient<EggInventoryTotalQuantityReport>("/Report/egginventorytotalquantity");
 const getSalesReportByMonth = new APIClient<SalesReport>("/Report/salesreport-by-month");
 const getTotalSalesReport = new APIClient<TotalSalesReport>("/Report/totalsales");
+const getTotalExpensesReport = new APIClient<TotalSalesReport>("/Report/totalexpenses");
+const getTotalProfitReport = new APIClient<TotalSalesReport>("/Report/totalprofit");
 
 export const useGetReportHarvestBy = (month?: number | null, year?: number | null) => {
     return useQuery<FetchResponse<ReportHaravestBy>, Error>({
@@ -74,6 +76,26 @@ export const useGetTotalSalesReport = () => {
         queryKey: ["totalsalesreport"],
         queryFn: async () => {
             const response = await getTotalSalesReport.getAll();
+            return response.results as unknown as number;
+        },
+    });
+}
+
+export const useGetTotalExpensesReport = () => {
+    return useQuery<number, Error>({
+        queryKey: ["totalexpensesreport"],
+        queryFn: async () => {
+            const response = await getTotalExpensesReport.getAll();
+            return response.results as unknown as number;
+        },
+    });
+}
+
+export const useGetTotalProfitReport = () => {
+    return useQuery<number, Error>({
+        queryKey: ["totalprofitreport"],
+        queryFn: async () => {
+            const response = await getTotalProfitReport.getAll();
             return response.results as unknown as number;
         },
     });
