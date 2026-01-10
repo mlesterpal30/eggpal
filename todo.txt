@@ -28,6 +28,10 @@ Expences
 
 Notifiction
 - send a remider notif if every 7pm and still no harvest for today
+- create a notification icon or button where all notifacation is stored make it look liek the facebook
+
+Activities Calendar
+
 
 All 
 - updte the eggreporsitory to harvest repository

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Flex } from "@chakra-ui/react";
+import { Flex, useToast } from "@chakra-ui/react";
 import { Outlet } from "react-router-dom";
 import Navbar from "../Navbar";
 import Sidebar from "../Sidebar";
@@ -7,11 +7,31 @@ import { FaChartBar } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import { BsCashCoin } from "react-icons/bs";
 import { FaBox } from "react-icons/fa";
+import { useNotificationHub } from "../../hooks/hubs/NotificationHub";
 
 const AdminLayout = () => {
+    const toast = useToast();
+    
     // Initialize sidebar as open on large screens, closed on small screens
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
         return window.innerWidth >= 768;
+    });
+
+    // NotificationHub connection for real-time notifications
+    useNotificationHub({
+        onNotificationReceived: (message: string, type: string) => {
+            // Determine toast status based on notification type
+            const status = type === 'HarvestReminder' ? 'warning' : 'info';
+            
+            toast({
+                title: 'Notification',
+                description: message,
+                status: status,
+                duration: 5000,
+                isClosable: true,
+                position: 'top-right',
+            });
+        },
     });
     
     const links = [
