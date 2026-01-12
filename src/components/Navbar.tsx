@@ -1,4 +1,6 @@
 import { Text, Flex, IconButton } from "@chakra-ui/react";
+import Notification from "./Notification";
+import Settings from "./Settings";
 
 type NavbarProps = {
     onMenuClick: () => void;
@@ -13,6 +15,8 @@ const Navbar = ({ onMenuClick, isSidebarOpen }: NavbarProps) => {
             p={4}
             alignItems="center"
             className="shadow-sm"
+            justifyContent="space-between"
+            align="center"
         >
             {/* Hamburger menu button - visible on all screen sizes */}
             <button
@@ -46,8 +50,10 @@ const Navbar = ({ onMenuClick, isSidebarOpen }: NavbarProps) => {
                     </svg>
                 )}
             </button>
-            
-            <Text className="text-gray-800 font-medium">this is navbar</Text>
+            <Flex alignItems="center" gap={2}>
+                <Notification />
+                <Settings />
+            </Flex>
         </Flex>
     );
 }

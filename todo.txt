@@ -27,11 +27,24 @@ Expences
 - render it on the table
 
 Notifiction
-- send a remider notif if every 7pm and still no harvest for today
+-✅ send a remider notif if every 7pm and still no harvest for today
 - create a notification icon or button where all notifacation is stored make it look liek the facebook
+- if no record uhmm make it look like the facebook one
+- ✅ handle delete liek hte fcebook one
+- separate today and 
+- add notification every 1pm check if there still no record mark it as differnet notic you dont feed your chicken in that day.
+- complete the functioanlity of the mark as read and delete
+- ✅ uhmm make a dot on the notication that is not read on the left side.
+- add number on notification where notificaiton is unread
 
 Activities Calendar
 
+Weather Forecast
+-weather today
+- average temparate per day store
 
 All 
 - updte the eggreporsitory to harvest repository
+
+overall
+- adjust the state import hooks, heleper funciton and setter functin on all compnents
