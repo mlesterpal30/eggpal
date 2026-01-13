@@ -1,6 +1,7 @@
 import { Text, Flex, IconButton } from "@chakra-ui/react";
 import Notification from "./Notification";
 import Settings from "./Settings";
+import Weather from "./Weather";
 
 type NavbarProps = {
     onMenuClick: () => void;
@@ -51,6 +52,7 @@ const Navbar = ({ onMenuClick, isSidebarOpen }: NavbarProps) => {
                 )}
             </button>
             <Flex alignItems="center" gap={2}>
+                <Weather />
                 <Notification />
                 <Settings />
             </Flex>

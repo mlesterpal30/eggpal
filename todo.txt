@@ -5,6 +5,7 @@ Report
 - ✅ add dashboard box for inventory per size
 - ✅ check if the dasbhoard is accurate when data table change
 -  ✅ add dashboard box for total profits and total expences
+- add link to dashboard box on records page(sales, profit, expenses)
 
 Inventory
 - ✅ create function for creating record for harvesting today
@@ -23,24 +24,26 @@ Sales
 -✅  add filter based on specific date
 
 Expences 
-- create functioanlity on expences ModalHeader
-- render it on the table
+- ✅create functioanlity on expences ModalHeader
+- ✅render it on the table
 
 Notifiction
 -✅ send a remider notif if every 7pm and still no harvest for today
-- create a notification icon or button where all notifacation is stored make it look liek the facebook
-- if no record uhmm make it look like the facebook one
+-✅ create a notification icon or button where all notifacation is stored make it look liek the facebook
+-✅  if no record uhmm make it look like the facebook one
 - ✅ handle delete liek hte fcebook one
-- separate today and 
-- add notification every 1pm check if there still no record mark it as differnet notic you dont feed your chicken in that day.
-- complete the functioanlity of the mark as read and delete
+- ✅ separate today and 
+- ✅ add notification every 1pm check if there still no record mark it as differnet notic you dont feed your chicken in that day.
+- ✅ complete the functioanlity of the mark as read and delete
 - ✅ uhmm make a dot on the notication that is not read on the left side.
-- add number on notification where notificaiton is unread
+- ✅ add number on notification where notificaiton is unread
+- i can see realtim also to the list oft the notificatoin also in the number or unread notif
 
 Activities Calendar
 
 Weather Forecast
--weather today
+-✅ weather today
+- record for temperature per day
 - average temparate per day store
 
 All 
