@@ -56,6 +56,11 @@ const AdminLayout = () => {
             path: "/calendar",
             icon: <FaCalendarAlt />,
         },
+        {
+            name: "Calendar2",
+            path: "/calendar2",
+            icon: <FaCalendarAlt />,
+        },
     ];
 
     // Handle window resize - automatically adjust sidebar based on screen size

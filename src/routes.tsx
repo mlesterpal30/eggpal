@@ -7,6 +7,7 @@ import Sales from "./components/Sales";
 import Inventory from "./components/Inventory";
 import Finance from "./components/Finance";
 import Calendar from "./components/Calendar";
+import Calendar2 from "./components/Calendar2";
 
 const router = createBrowserRouter([
 	{
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
 			{
 				path: "calendar",
 				element: <Calendar />,
+			},
+			{
+				path: "calendar2",
+				element: <Calendar2 />,
 			},
 		],
 	
