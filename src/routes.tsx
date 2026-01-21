@@ -6,6 +6,7 @@ import App from "./App";
 import Sales from "./components/Sales";
 import Inventory from "./components/Inventory";
 import Finance from "./components/Finance";
+import Calendar from "./components/Calendar";
 
 const router = createBrowserRouter([
 	{
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
 			{
 				path: "finance",
 				element: <Finance />,
+			},
+			{
+				path: "calendar",
+				element: <Calendar />,
 			},
 		],
 	

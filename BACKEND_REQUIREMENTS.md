@@ -254,3 +254,4 @@ If you need clarification on any requirements, please reference:
 - Frontend Report repository: `src/hooks/ReportRepository.ts`
 - Expense entity: `src/entiies/Expense.ts`
 - CreateExpense DTO: `src/entiies/Dto/CreateExpense.ts`
+

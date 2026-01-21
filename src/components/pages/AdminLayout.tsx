@@ -8,6 +8,7 @@ import { FaUser } from "react-icons/fa";
 import { BsCashCoin } from "react-icons/bs";
 import { FaBox } from "react-icons/fa";
 import { useNotificationHub } from "../../hooks/hubs/NotificationHub";
+import { FaCalendarAlt } from "react-icons/fa";
 
 const AdminLayout = () => {
     const toast = useToast();
@@ -49,6 +50,11 @@ const AdminLayout = () => {
             name: "Inventory",
             path: "/inventory",
             icon: <FaBox />,
+        },
+        {
+            name: "Calendar",
+            path: "/calendar",
+            icon: <FaCalendarAlt />,
         },
     ];
 
