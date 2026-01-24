@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useCalendarApp } from "@schedule-x/react";
 import { ScheduleXCalendar } from "@schedule-x/react";
 import { createViewWeek, createViewMonthGrid } from "@schedule-x/calendar";
 import "@schedule-x/theme-default/dist/index.css";
 import { Temporal } from "temporal-polyfill";
+import { useForm } from "react-hook-form";
 import {
   Button,
   Modal,
@@ -18,78 +19,162 @@ import {
   FormLabel,
   Input,
   VStack,
+  FormErrorMessage,
 } from "@chakra-ui/react";
+import { useCreateEvent, useGetEvents } from "../hooks/EventRepository";
+import { CreateEvent } from "../entiies/Dto/CreateEvent";
+import { Event } from "../entiies/Event";
 
 const Calendar2 = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [formData, setFormData] = useState({
-    title: "",
-    date: "",
-    startTime: "",
-    endTime: "",
-  });
+  const createEventMutation = useCreateEvent();
+  const { data: eventsData, isLoading: isEventsLoading } = useGetEvents();
 
   // Get current time in Philippines timezone (Asia/Manila, UTC+8)
   const philippinesTimeZone = "Asia/Manila";
   const now = Temporal.Now.zonedDateTimeISO(philippinesTimeZone);
   const today = now.toPlainDate();
 
-  // State to store events
-  const [events, setEvents] = useState([
-    {
-      id: "1",
-      title: "Task 1",
-      start: today.toZonedDateTime(philippinesTimeZone).with({ hour: 9, minute: 0 }),
-      end: today.toZonedDateTime(philippinesTimeZone).with({ hour: 10, minute: 0 }),
+  // React Hook Form
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<{
+    title: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }>({
+    defaultValues: {
+      title: "",
+      date: today.toString(),
+      startTime: "",
+      endTime: "",
     },
-    {
-      id: "2",
-      title: "Task 2",
-      start: today.toZonedDateTime(philippinesTimeZone).with({ hour: 14, minute: 30 }),
-      end: today.toZonedDateTime(philippinesTimeZone).with({ hour: 16, minute: 0 }),
-    },
-  ]);
+  });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  // Convert API events to Schedule-X format
+  const convertEventsToScheduleX = () => {
+    if (!eventsData?.results || eventsData.results.length === 0) return [];
+
+    return eventsData.results.map((event: Event) => {
+      try {
+        // Convert backend string -> Schedule-X Temporal string.
+        // Backend: "2026-01-22 21:22:00.000000"
+        // Needed:  "2026-01-22T21:22:00+08:00[Asia/Manila]"
+        const toScheduleXTemporalString = (value: string): string => {
+          const raw = value.trim();
+
+          // If it's ISO + offset but missing [Zone], append it
+          if (/[+-]\d{2}:\d{2}$/.test(raw)) return `${raw}[${philippinesTimeZone}]`;
+
+
+          // Backend "YYYY-MM-DD HH:mm:ss.ffffff" (or without fractional seconds)
+          // - remove fractional seconds
+          // - replace space with 'T'
+          const noFraction = raw.split(".")[0];
+          if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(noFraction)) {
+            const withT = noFraction.replace(" ", "T");
+            return `${withT}+08:00[${philippinesTimeZone}]`;
+          }
+
+          // ISO without timezone, like "YYYY-MM-DDTHH:mm:ss"
+          if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(noFraction)) {
+            return `${noFraction}+08:00[${philippinesTimeZone}]`;
+          }
+
+          // Date-only -> treat as start of day in PH
+          if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+            return `${raw}T00:00:00+08:00[${philippinesTimeZone}]`;
+          }
+
+          throw new Error(`Unrecognized date format: "${value}"`);
+        };
+
+        const startZoned = Temporal.ZonedDateTime.from(toScheduleXTemporalString(event.start));
+        const endZoned = Temporal.ZonedDateTime.from(toScheduleXTemporalString(event.end));
+
+        return {
+          id: event.id.toString(),
+          title: event.title,
+          start: startZoned,
+          end: endZoned,
+        };
+      } catch (error) {
+        console.error("Error parsing event dates:", error, event);
+        return null;
+      }
+    }).filter((event) => event !== null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const events = convertEventsToScheduleX();
 
-    if (!formData.title || !formData.date || !formData.startTime || !formData.endTime) {
-      alert("Please fill in all fields");
-      return;
+  const onSubmit = async (data: {
+    title: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }) => {
+    try {
+      // Parse date and time
+      const [startHour, startMinute] = data.startTime.split(":").map(Number);
+      const [endHour, endMinute] = data.endTime.split(":").map(Number);
+      const selectedDate = Temporal.PlainDate.from(data.date);
+
+      // Create ZonedDateTime objects in Philippines timezone
+      const startDateTime = selectedDate
+        .toZonedDateTime(philippinesTimeZone)
+        .with({ hour: startHour, minute: startMinute });
+      const endDateTime = selectedDate
+        .toZonedDateTime(philippinesTimeZone)
+        .with({ hour: endHour, minute: endMinute });
+
+      // Format dates for .NET compatibility (ISO 8601 with timezone offset, no timezone name)
+      // Format: "2024-01-23T06:00:00+08:00"
+      const formatDateTimeForDotNet = (zonedDateTime: Temporal.ZonedDateTime): string => {
+        const year = zonedDateTime.year.toString().padStart(4, '0');
+        const month = zonedDateTime.month.toString().padStart(2, '0');
+        const day = zonedDateTime.day.toString().padStart(2, '0');
+        const hour = zonedDateTime.hour.toString().padStart(2, '0');
+        const minute = zonedDateTime.minute.toString().padStart(2, '0');
+        const second = zonedDateTime.second.toString().padStart(2, '0');
+        const offset = zonedDateTime.offset; // e.g., "+08:00"
+        return `${year}-${month}-${day}T${hour}:${minute}:${second}${offset}`;
+      };
+
+      // Create event data for API
+      const createEventData: CreateEvent = {
+        title: data.title,
+        start: formatDateTimeForDotNet(startDateTime),
+        end: formatDateTimeForDotNet(endDateTime),
+      };
+
+      // Call the API
+      await createEventMutation.mutateAsync(createEventData);
+
+      // Reset form and close modal
+      reset({
+        title: "",
+        date: today.toString(),
+        startTime: "",
+        endTime: "",
+      });
+      onClose();
+    } catch (error) {
+      console.error("Error creating event:", error);
     }
+  };
 
-    // Parse date and time
-    const [startHour, startMinute] = formData.startTime.split(":").map(Number);
-    const [endHour, endMinute] = formData.endTime.split(":").map(Number);
-    const selectedDate = Temporal.PlainDate.from(formData.date);
-
-    // Create new event
-    const newEvent = {
-      id: Date.now().toString(),
-      title: formData.title,
-      start: selectedDate.toZonedDateTime(philippinesTimeZone).with({ hour: startHour, minute: startMinute }),
-      end: selectedDate.toZonedDateTime(philippinesTimeZone).with({ hour: endHour, minute: endMinute }),
-    }; 
-
-    // Add to events list
-    setEvents((prev) => [...prev, newEvent]);
-
-    // Reset form and close modal
-    setFormData({
+  const handleOpenCreate = () => {
+    reset({
       title: "",
-      date: "",
+      date: today.toString(),
       startTime: "",
       endTime: "",
     });
-    onClose();
+    onOpen();
   };
 
   const calendar = useCalendarApp({
@@ -108,13 +193,10 @@ const Calendar2 = () => {
     }
   }, [events, calendar]);
 
-  // Get today's date in YYYY-MM-DD format for default value
-  const todayString = today.toString();
-
   return (
     <div style={{ padding: "20px" }}>
       <div style={{ marginBottom: "20px" }}>
-        <Button colorScheme="blue" onClick={onOpen}>
+        <Button colorScheme="blue" onClick={handleOpenCreate}>
           Add New Task
         </Button>
       </div>
@@ -125,50 +207,45 @@ const Calendar2 = () => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <ModalHeader>Add New Task</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <VStack spacing={4}>
-                <FormControl isRequired>
+                <FormControl isInvalid={!!errors.title} isRequired>
                   <FormLabel>Task Title</FormLabel>
                   <Input
-                    name="title"
-                    value={formData.title}
-                    onChange={handleInputChange}
+                    {...register("title", { required: "Task title is required" })}
                     placeholder="Enter task title"
                   />
+                  <FormErrorMessage>{errors.title?.message}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl isRequired>
+                <FormControl isInvalid={!!errors.date} isRequired>
                   <FormLabel>Date</FormLabel>
                   <Input
-                    name="date"
                     type="date"
-                    value={formData.date}
-                    onChange={handleInputChange}
-                    defaultValue={todayString}
+                    {...register("date", { required: "Date is required" })}
                   />
+                  <FormErrorMessage>{errors.date?.message}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl isRequired>
+                <FormControl isInvalid={!!errors.startTime} isRequired>
                   <FormLabel>Start Time</FormLabel>
                   <Input
-                    name="startTime"
                     type="time"
-                    value={formData.startTime}
-                    onChange={handleInputChange}
+                    {...register("startTime", { required: "Start time is required" })}
                   />
+                  <FormErrorMessage>{errors.startTime?.message}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl isRequired>
+                <FormControl isInvalid={!!errors.endTime} isRequired>
                   <FormLabel>End Time</FormLabel>
                   <Input
-                    name="endTime"
                     type="time"
-                    value={formData.endTime}
-                    onChange={handleInputChange}
+                    {...register("endTime", { required: "End time is required" })}
                   />
+                  <FormErrorMessage>{errors.endTime?.message}</FormErrorMessage>
                 </FormControl>
               </VStack>
             </ModalBody>
@@ -177,7 +254,11 @@ const Calendar2 = () => {
               <Button variant="ghost" mr={3} onClick={onClose}>
                 Cancel
               </Button>
-              <Button colorScheme="blue" type="submit">
+              <Button
+                colorScheme="blue"
+                type="submit"
+                isLoading={createEventMutation.isPending}
+              >
                 Create Task
               </Button>
             </ModalFooter>
