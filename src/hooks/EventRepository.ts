@@ -8,7 +8,7 @@ const getEventsClient = new APIClient<Event>("/Event/all-events");
 
 export const useCreateEvent = () => {
     const queryClient = useQueryClient();
-    return useMutation<Event, Error, CreateEvent>({
+    return useMutation<CreateEvent, Error, CreateEvent>({
         mutationFn: (data: CreateEvent) => createEventClient.post(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["events"] });
@@ -16,10 +16,16 @@ export const useCreateEvent = () => {
     });
 };
 
-export const useGetEvents = () => {
+export const useGetEvents = (fromDate: string | null) => {
     return useQuery<FetchResponse<Event>, Error>({
-        queryKey: ["events"],
-        queryFn: () => getEventsClient.getAll(),
+        queryKey: ["events", fromDate],
+        queryFn: () => getEventsClient.getAll({
+            params: {
+                fromDate: fromDate,
+            },
+        }),
     });
 };
+
+
 

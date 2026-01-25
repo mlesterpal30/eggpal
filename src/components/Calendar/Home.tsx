@@ -21,19 +21,20 @@ import {
   VStack,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { useCreateEvent, useGetEvents } from "../hooks/EventRepository";
-import { CreateEvent } from "../entiies/Dto/CreateEvent";
-import { Event } from "../entiies/Event";
+import { useCreateEvent, useGetEvents } from "../../hooks/EventRepository";
+import { CreateEvent } from "../../entiies/Dto/CreateEvent";
+import { Event } from "../../entiies/Event";
 
-const Calendar2 = () => {
+const Home = () => {
+    // Get current time in Philippines timezone (Asia/Manila, UTC+8)
+    const philippinesTimeZone = "Asia/Manila";
+    const now = Temporal.Now.zonedDateTimeISO(philippinesTimeZone);
+    const today = now.toPlainDate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const createEventMutation = useCreateEvent();
-  const { data: eventsData, isLoading: isEventsLoading } = useGetEvents();
+  const { data: eventsData, isLoading: isEventsLoading } = useGetEvents(null);
 
-  // Get current time in Philippines timezone (Asia/Manila, UTC+8)
-  const philippinesTimeZone = "Asia/Manila";
-  const now = Temporal.Now.zonedDateTimeISO(philippinesTimeZone);
-  const today = now.toPlainDate();
+
 
   // React Hook Form
   const {
@@ -88,7 +89,7 @@ const Calendar2 = () => {
           // Date-only -> treat as start of day in PH
           if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
             return `${raw}T00:00:00+08:00[${philippinesTimeZone}]`;
-          }
+          }  
 
           throw new Error(`Unrecognized date format: "${value}"`);
         };
@@ -269,4 +270,4 @@ const Calendar2 = () => {
   );
 };
 
-export default Calendar2;
+export default Home;

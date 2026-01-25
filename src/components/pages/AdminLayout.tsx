@@ -51,14 +51,9 @@ const AdminLayout = () => {
             path: "/inventory",
             icon: <FaBox />,
         },
-        {
+        {   
             name: "Calendar",
             path: "/calendar",
-            icon: <FaCalendarAlt />,
-        },
-        {
-            name: "Calendar2",
-            path: "/calendar2",
             icon: <FaCalendarAlt />,
         },
     ];
