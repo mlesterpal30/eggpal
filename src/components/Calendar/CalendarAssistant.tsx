@@ -19,10 +19,24 @@ import {
   Text,
   Spinner,
   Center,
+  IconButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  useDisclosure,
+  Input,
+  FormErrorMessage,
 } from "@chakra-ui/react";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import { FaEye } from "react-icons/fa";
 import { Temporal } from "temporal-polyfill";
-import { useGetEvents } from "../../hooks/EventRepository";
+import { useGetEvents, useDeleteEvent, useUpdateEvent } from "../../hooks/EventRepository";
 import { Event } from "../../entiies/Event";
+import { useForm } from "react-hook-form";
 
 const CalendarAssistant = () => {
   const philippinesTimeZone = "Asia/Manila";
@@ -36,6 +50,40 @@ const CalendarAssistant = () => {
   
   // State to track when to fetch - only fetch when button is clicked
   const [searchDate, setSearchDate] = useState<string | null>(null);
+  
+  // Delete modal state
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+  const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+  
+  // Edit modal state
+  const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
+  const [eventToEdit, setEventToEdit] = useState<Event | null>(null);
+  
+  // Delete event mutation
+  const deleteEventMutation = useDeleteEvent();
+  
+  // Update event mutation
+  const updateEventMutation = useUpdateEvent();
+
+  // Edit form
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<{
+    title: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }>({
+    defaultValues: {
+      title: "",
+      date: "",
+      startTime: "",
+      endTime: "",
+    },
+  });
 
   // Convert year, month, week to date format: DD/MM/YYYY 12:00:00
   // Week value is the starting day (1, 8, 15, 22)
@@ -74,6 +122,180 @@ const CalendarAssistant = () => {
   const handleFilter = () => {
     if (fromDate) {
       setSearchDate(fromDate);
+    }
+  };
+
+  // Handle delete button click
+  const handleDeleteClick = (event: Event) => {
+    setEventToDelete(event);
+    onDeleteOpen();
+  };
+
+  // Extract date from DateTime string (YYYY-MM-DD)
+  const extractDate = (dateTimeString: string): string => {
+    try {
+      // Remove fractional seconds if present
+      const cleanDate = dateTimeString.split('.')[0].trim();
+      
+      // Handle "YYYY-MM-DD HH:mm:ss" format
+      if (cleanDate.includes(' ')) {
+        const [datePart] = cleanDate.split(' ');
+        return datePart;
+      }
+      
+      // Handle ISO format with T
+      if (cleanDate.includes('T')) {
+        const [datePart] = cleanDate.split('T');
+        return datePart;
+      }
+      
+      // If it's already just a date
+      if (/^\d{4}-\d{2}-\d{2}$/.test(cleanDate)) {
+        return cleanDate;
+      }
+      
+      return "";
+    } catch (error) {
+      console.error("Error extracting date:", error);
+      return "";
+    }
+  };
+
+  // Extract time from DateTime string (HH:mm)
+  const extractTime = (dateTimeString: string): string => {
+    try {
+      // Remove fractional seconds if present
+      const cleanDate = dateTimeString.split('.')[0].trim();
+      
+      // Handle "YYYY-MM-DD HH:mm:ss" format
+      if (cleanDate.includes(' ')) {
+        const [, timePart] = cleanDate.split(' ');
+        if (timePart) {
+          const [hour, minute] = timePart.split(':');
+          return `${hour}:${minute}`;
+        }
+      }
+      
+      // Handle ISO format with T
+      if (cleanDate.includes('T')) {
+        const [, timePart] = cleanDate.split('T');
+        if (timePart) {
+          // Remove timezone if present
+          const timeOnly = timePart.split('+')[0].split('-')[0].split('Z')[0];
+          const [hour, minute] = timeOnly.split(':');
+          return `${hour}:${minute}`;
+        }
+      }
+      
+      return "";
+    } catch (error) {
+      console.error("Error extracting time:", error);
+      return "";
+    }
+  };
+
+  // Handle edit button click
+  const handleEditClick = (event: Event) => {
+    setEventToEdit(event);
+    
+    // Extract date and time from event.start and event.end
+    const startDate = extractDate(event.start);
+    const startTime = extractTime(event.start);
+    const endTime = extractTime(event.end);
+    
+    // Populate form with event data
+    reset({
+      title: event.title,
+      date: startDate,
+      startTime: startTime,
+      endTime: endTime,
+    });
+    
+    onEditOpen();
+  };
+
+  // Handle edit form submission
+  const handleEditSubmit = async (data: {
+    title: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }) => {
+    if (!eventToEdit) return;
+
+    try {
+      // Parse date and time
+      const [startHour, startMinute] = data.startTime.split(":").map(Number);
+      const [endHour, endMinute] = data.endTime.split(":").map(Number);
+      const selectedDate = Temporal.PlainDate.from(data.date);
+
+      // Create ZonedDateTime objects in Philippines timezone
+      const startDateTime = selectedDate
+        .toZonedDateTime(philippinesTimeZone)
+        .with({ hour: startHour, minute: startMinute });
+      const endDateTime = selectedDate
+        .toZonedDateTime(philippinesTimeZone)
+        .with({ hour: endHour, minute: endMinute });
+
+      // Format dates for .NET compatibility (ISO 8601 with timezone offset, no timezone name)
+      // Format: "2024-01-23T06:00:00+08:00"
+      const formatDateTimeForDotNet = (zonedDateTime: Temporal.ZonedDateTime): string => {
+        const year = zonedDateTime.year.toString().padStart(4, '0');
+        const month = zonedDateTime.month.toString().padStart(2, '0');
+        const day = zonedDateTime.day.toString().padStart(2, '0');
+        const hour = zonedDateTime.hour.toString().padStart(2, '0');
+        const minute = zonedDateTime.minute.toString().padStart(2, '0');
+        const second = zonedDateTime.second.toString().padStart(2, '0');
+        const offset = zonedDateTime.offset; // e.g., "+08:00"
+        return `${year}-${month}-${day}T${hour}:${minute}:${second}${offset}`;
+      };
+
+      // Create updated event data
+      const updatedEvent: Event = {
+        id: eventToEdit.id,
+        title: data.title,
+        start: formatDateTimeForDotNet(startDateTime),
+        end: formatDateTimeForDotNet(endDateTime),
+      };
+
+      // Call the update API
+      await updateEventMutation.mutateAsync(updatedEvent);
+
+      // Close modal and reset form
+      onEditClose();
+      setEventToEdit(null);
+      reset({
+        title: "",
+        date: "",
+        startTime: "",
+        endTime: "",
+      });
+
+      // Refresh the events list by re-triggering the search
+      if (searchDate) {
+        setSearchDate(null);
+        setTimeout(() => setSearchDate(searchDate), 100);
+      }
+    } catch (error) {
+      console.error("Error updating event:", error);
+    }
+  };
+
+  // Handle confirm delete
+  const handleConfirmDelete = async () => {
+    if (eventToDelete) {
+      try {
+        await deleteEventMutation.mutateAsync(eventToDelete.id);
+        onDeleteClose();
+        setEventToDelete(null);
+        // Refresh the events list by re-triggering the search
+        if (searchDate) {
+          setSearchDate(null);
+          setTimeout(() => setSearchDate(searchDate), 100);
+        }
+      } catch (error) {
+        console.error("Error deleting event:", error);
+      }
     }
   };
 
@@ -209,6 +431,7 @@ const CalendarAssistant = () => {
                       <Th>Title</Th>
                       <Th>Start</Th>
                       <Th>End</Th>
+                      <Th>Actions</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -218,6 +441,33 @@ const CalendarAssistant = () => {
                         <Td>{event.title}</Td>
                         <Td>{formatDateForDisplay(event.start)}</Td>
                         <Td>{formatDateForDisplay(event.end)}</Td>
+                        <Td>
+                          <HStack spacing={2}>
+                            <IconButton
+                              aria-label="View event"
+                              icon={<FaEye />}
+                              size="sm"
+                              colorScheme="blue"
+                              variant="ghost"
+                            />
+                            <IconButton
+                              aria-label="Edit event"
+                              icon={<EditIcon />}
+                              size="sm"
+                              colorScheme="green"
+                              variant="ghost"
+                              onClick={() => handleEditClick(event)}
+                            />
+                            <IconButton
+                              aria-label="Delete event"
+                              icon={<DeleteIcon />}
+                              size="sm"
+                              colorScheme="red"
+                              variant="ghost"
+                              onClick={() => handleDeleteClick(event)}
+                            />
+                          </HStack>
+                        </Td>
                       </Tr>
                     ))}
                   </Tbody>
@@ -230,6 +480,95 @@ const CalendarAssistant = () => {
             )}
           </Box>
         )}
+
+        {/* Delete Confirmation Modal */}
+        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Delete Event</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                Are you sure you want to delete the event "{eventToDelete?.title}"? 
+                This action cannot be undone.
+              </Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button variant="ghost" mr={3} onClick={onDeleteClose}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={handleConfirmDelete}
+                isLoading={deleteEventMutation.isPending}
+              >
+                Delete
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        {/* Edit Event Modal */}
+        <Modal isOpen={isEditOpen} onClose={onEditClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <form onSubmit={handleSubmit(handleEditSubmit)}>
+              <ModalHeader>Edit Event</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <VStack spacing={4}>
+                  <FormControl isInvalid={!!errors.title} isRequired>
+                    <FormLabel>Event Title</FormLabel>
+                    <Input
+                      {...register("title", { required: "Event title is required" })}
+                      placeholder="Enter event title"
+                    />
+                    <FormErrorMessage>{errors.title?.message}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isInvalid={!!errors.date} isRequired>
+                    <FormLabel>Date</FormLabel>
+                    <Input
+                      type="date"
+                      {...register("date", { required: "Date is required" })}
+                    />
+                    <FormErrorMessage>{errors.date?.message}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isInvalid={!!errors.startTime} isRequired>
+                    <FormLabel>Start Time</FormLabel>
+                    <Input
+                      type="time"
+                      {...register("startTime", { required: "Start time is required" })}
+                    />
+                    <FormErrorMessage>{errors.startTime?.message}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isInvalid={!!errors.endTime} isRequired>
+                    <FormLabel>End Time</FormLabel>
+                    <Input
+                      type="time"
+                      {...register("endTime", { required: "End time is required" })}
+                    />
+                    <FormErrorMessage>{errors.endTime?.message}</FormErrorMessage>
+                  </FormControl>
+                </VStack>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="ghost" mr={3} onClick={onEditClose}>
+                  Cancel
+                </Button>
+                <Button
+                  colorScheme="blue"
+                  type="submit"
+                  isLoading={updateEventMutation.isPending}
+                >
+                  Save Changes
+                </Button>
+              </ModalFooter>
+            </form>
+          </ModalContent>
+        </Modal>
       </VStack>
     </Box>
   );
