@@ -32,7 +32,11 @@ export const useGetEvents = (fromDate: string | null) => {
 export const useDeleteEvent = () => {
     const queryClient = useQueryClient();
     return useMutation<Event, Error, number>({
-        mutationFn: (id: number) => deleteEventClient.delete(id),
+        mutationFn: (id: number) => deleteEventClient.delete({
+            params: {
+                eventId: id,
+            },
+        }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["events"] });
         }

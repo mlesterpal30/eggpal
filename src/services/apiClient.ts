@@ -39,8 +39,8 @@ class APIClient<T> {
 		return axiosInstance.put<T>(this.endpoint + "/" + id, data).then((res) => res.data);
 	};
 
-	delete = (id: number | string) => {
-		return axiosInstance.delete<T>(this.endpoint + "/" + id).then((res) => res.data);
+	delete = (config?: AxiosRequestConfig) => {
+		return axiosInstance.delete<T>(this.endpoint, config).then((res) => res.data);
 	};
 }
 
