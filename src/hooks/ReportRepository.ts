@@ -14,6 +14,7 @@ const getSalesReportByMonth = new APIClient<SalesReport>("/Report/salesreport-by
 const getTotalSalesReport = new APIClient<TotalSalesReport>("/Report/totalsales");
 const getTotalExpensesReport = new APIClient<TotalSalesReport>("/Report/totalexpenses");
 const getTotalProfitReport = new APIClient<TotalSalesReport>("/Report/totalprofit");
+const getUpcomingEventCount = new APIClient<number>("/Report/upcoming-event");
 
 export const useGetReportHarvestBy = (month?: number | null, year?: number | null) => {
     return useQuery<FetchResponse<ReportHaravestBy>, Error>({
@@ -96,6 +97,16 @@ export const useGetTotalProfitReport = () => {
         queryKey: ["totalprofitreport"],
         queryFn: async () => {
             const response = await getTotalProfitReport.getAll();
+            return response.results as unknown as number;
+        },
+    });
+}
+
+export const useGetUpcomingEventCount = () => {
+    return useQuery<number, Error>({
+        queryKey: ["upcomingeventcount"],
+        queryFn: async () => {
+            const response = await getUpcomingEventCount.getAll();
             return response.results as unknown as number;
         },
     });

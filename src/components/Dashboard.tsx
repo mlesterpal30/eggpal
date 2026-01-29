@@ -14,7 +14,7 @@ import {
     HStack,
     VStack,
 } from "@chakra-ui/react";
-import { MdAttachMoney, MdTrendingUp, MdTrendingDown, MdAccountBalanceWallet } from "react-icons/md";
+import { MdAttachMoney, MdTrendingUp, MdTrendingDown, MdAccountBalanceWallet, MdEvent } from "react-icons/md";
 import { Bar, Pie, Line } from "react-chartjs-2";
 import {
     Chart as ChartJS,
@@ -36,6 +36,7 @@ import {
     useGetTotalSalesReport,
     useGetTotalExpensesReport,
     useGetTotalProfitReport,
+    useGetUpcomingEventCount,
 } from "../hooks/ReportRepository";
 
 // Register Chart.js components
@@ -313,6 +314,9 @@ const Dashboard = () => {
 
     // ==================== Total Profit Report ====================
     const { data: totalProfitData, isLoading: isTotalProfitLoading, error: totalProfitError } = useGetTotalProfitReport();
+
+    // ==================== Upcoming Event Count Report ====================
+    const { data: upcomingEventCountData, isLoading: isUpcomingEventCountLoading, error: upcomingEventCountError } = useGetUpcomingEventCount();
 
     // ==================== Sales Report ====================
     const { data: salesReportData, isLoading: isSalesReportLoading, error: salesReportError } = useGetSalesReportByMonth();
@@ -598,6 +602,58 @@ const Dashboard = () => {
                                 <HStack spacing={1} color="green.500" fontSize="sm">
                                     <MdTrendingUp />
                                     <Text>All time</Text>
+                                </HStack>
+                            </VStack>
+                        </HStack>
+                    )}
+                </Box>
+
+                {/* Upcoming Events Count Card */}
+                <Box
+                    bg="white"
+                    p={6}
+                    borderRadius="lg"
+                    boxShadow="lg"
+                    borderLeft="4px solid"
+                    borderColor="purple.500"
+                    _hover={{
+                        boxShadow: "xl",
+                        transform: "translateY(-2px)",
+                        transition: "all 0.2s",
+                    }}
+                    transition="all 0.2s"
+                >
+                    {isUpcomingEventCountLoading ? (
+                        <Flex align="center" justify="center" h="100px">
+                            <Spinner size="lg" color="purple.500" />
+                        </Flex>
+                    ) : upcomingEventCountError ? (
+                        <Alert status="error" borderRadius="md">
+                            <AlertIcon />
+                            <Text>Error loading upcoming events count: {upcomingEventCountError.message}</Text>
+                        </Alert>
+                    ) : (
+                        <HStack spacing={4} align="flex-start">
+                            <Box
+                                bg="purple.50"
+                                p={3}
+                                borderRadius="lg"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                            >
+                                <MdEvent size={32} color="#805AD5" />
+                            </Box>
+                            <VStack align="flex-start" spacing={1} flex={1}>
+                                <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                                    Upcoming Events
+                                </Text>
+                                <Text fontSize="3xl" fontWeight="bold" color="gray.800">
+                                    {upcomingEventCountData !== undefined ? upcomingEventCountData.toLocaleString() : "N/A"}
+                                </Text>
+                                <HStack spacing={1} color="purple.500" fontSize="sm">
+                                    <MdEvent />
+                                    <Text>Upcoming</Text>
                                 </HStack>
                             </VStack>
                         </HStack>
