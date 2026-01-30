@@ -51,3 +51,9 @@ All
 
 overall
 - adjust the state import hooks, heleper funciton and setter functin on all compnents
+
+New features to add
+- 1. Customer / buyer management – list of buyers (name, contact, default order size, payment terms)
+- 2. Orders / delivery scheduling – create orders (customer, qty, size, date), mark delivered or pending
+- 9. Export reports (PDF/CSV) – export sales, expenses, or harvest reports for a date range
+- 15. Backup / restore or data export – export all data (or key tables) as JSON/CSV; optional import to restore

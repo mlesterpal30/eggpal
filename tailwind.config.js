@@ -10,6 +10,7 @@ export default {
 				inter: ["Inter", "sans-serif"],
 				geist: ["Geist", "sans-serif"],
 				londrina: ["Londrina Shadow", "sans-serif"],
+				rubik: ["Rubik Mono One", "monospace"],
 			},
     },
   },
