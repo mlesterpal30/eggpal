@@ -34,8 +34,8 @@ import {
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { FaEye } from "react-icons/fa";
 import { Temporal } from "temporal-polyfill";
-import { useGetEvents, useDeleteEvent, useUpdateEvent } from "../../hooks/EventRepository";
-import { Event } from "../../entiies/Event";
+import { useGetEvents, useDeleteEvent, useUpdateEvent } from "../../../hooks/EventRepository";
+import { Event } from "../../../entiies/Event";
 import { useForm } from "react-hook-form";
 
 const CalendarAssistant = () => {

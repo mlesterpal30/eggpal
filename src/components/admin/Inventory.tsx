@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import { Box, Table, Thead, Tbody, Tr, Td, TableContainer, useDisclosure, Th, HStack, IconButton, VStack } from '@chakra-ui/react'
 import { Text, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, FormErrorMessage, Input, Textarea, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, Select, Flex } from '@chakra-ui/react'
 import { useForm, Controller } from "react-hook-form";
-import { CreateHarvest } from '../entiies/Dto/CreateHarvest';
-import { useCreateHarvest, useGetAllHarvests, useGetAllHarvesters } from '../hooks/InventoryRepository';
+import { CreateHarvest } from '../../entiies/Dto/CreateHarvest';
+import { useCreateHarvest, useGetAllHarvests, useGetAllHarvesters } from '../../hooks/InventoryRepository';
 import { CiFilter } from "react-icons/ci";
 
 const Inventory = () => {

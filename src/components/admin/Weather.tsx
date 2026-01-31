@@ -1,5 +1,5 @@
 import { Flex, Text, Spinner } from "@chakra-ui/react";
-import { useGetWeather } from "../hooks/WeatherRepository";
+import { useGetWeather } from "../../hooks/WeatherRepository";
 import { WiDaySunny, WiRain, WiCloudy, WiSnow, WiFog, WiDayHaze, WiThunderstorm } from "react-icons/wi";
 import { ReactNode } from "react";
 

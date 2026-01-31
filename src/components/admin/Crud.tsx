@@ -41,10 +41,10 @@ import {
 
 import { Check } from "lucide-react";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { Kdrama } from "../entiies/Kdrama";
-import { useGetKdramas, useCreateKdrama, useUpdateKdrama, useDeleteKdrama } from "../hooks/KdramaRepository";
-import { useGetGenres } from "../hooks/KdramaRepository";
-import useKrdramaQueryStore from "../store";
+import { Kdrama } from "../../entiies/Kdrama";
+import { useGetKdramas, useCreateKdrama, useUpdateKdrama, useDeleteKdrama } from "../../hooks/KdramaRepository";
+import { useGetGenres } from "../../hooks/KdramaRepository";
+import useKrdramaQueryStore from "../../store";
 type KdramaFormData = Omit<Kdrama, "id">;
 
 // Helper function to convert DateTime string to date-only format (YYYY-MM-DD)

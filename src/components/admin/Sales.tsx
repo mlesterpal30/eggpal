@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import { Box, Table, Thead, Tbody, Tr, Td, TableContainer, useDisclosure, Th, HStack, IconButton, VStack, Tab, TabList, TabIndicator, TabPanels, TabPanel, Tabs } from '@chakra-ui/react'
 import { Text, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, FormErrorMessage, Input, Textarea, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, Select, Flex } from '@chakra-ui/react'
 import { useForm, Controller } from "react-hook-form";
-import { CreateSales } from '../entiies/Dto/CreateSales';
-import { useCreateSales, useGetAllSales, useGetAllTransactedByNames } from '../hooks/SalesRepository';
+import { CreateSales } from '../../entiies/Dto/CreateSales';
+import { useCreateSales, useGetAllSales, useGetAllTransactedByNames } from '../../hooks/SalesRepository';
 import { CiFilter } from 'react-icons/ci';
 
 const Sales = () => {

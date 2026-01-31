@@ -37,7 +37,7 @@ import {
     useGetTotalExpensesReport,
     useGetTotalProfitReport,
     useGetUpcomingEventCount,
-} from "../hooks/ReportRepository";
+} from "../../hooks/ReportRepository";
 
 // Register Chart.js components
 ChartJS.register(

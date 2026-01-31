@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import { Box, Table, Thead, Tbody, Tr, Td, TableContainer, useDisclosure, Th, HStack, IconButton, VStack } from '@chakra-ui/react'
 import { Text, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, FormErrorMessage, Input, Textarea, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, Flex } from '@chakra-ui/react'
 import { useForm, Controller } from "react-hook-form";
-import { CreateExpense } from '../entiies/Dto/CreateExpense';
-import { useCreateExpense, useGetAllExpenses } from '../hooks/ExpenseRepository';
+import { CreateExpense } from '../../entiies/Dto/CreateExpense';
+import { useCreateExpense, useGetAllExpenses } from '../../hooks/ExpenseRepository';
 import { CiFilter } from 'react-icons/ci';
 
 const Expenses = () => {

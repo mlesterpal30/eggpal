@@ -1,15 +1,21 @@
 import { createBrowserRouter } from "react-router-dom";
-import AdminLayout from "./components/pages/AdminLayout"
-import Dashboard from "./components/Dashboard";
-import Crud from "./components/Crud";
+import AdminLayout from "./components/admin/AdminLayout";
+import Dashboard from "./components/admin/Dashboard";
+import Crud from "./components/admin/Crud";
 import App from "./App";
-import Sales from "./components/Sales";
-import Inventory from "./components/Inventory";
-import Finance from "./components/Finance";
-import Calendar from "./components/Calendar/Calendar";
+import Sales from "./components/admin/Sales";
+import Inventory from "./components/admin/Inventory";
+import Finance from "./components/admin/Finance";
+import Calendar from "./components/admin/Calendar/Calendar";
+import Customer from "./components/customer/Customer";
+
 const router = createBrowserRouter([
 	{
 		path: "/",
+		element: <Customer />,
+	},
+	{
+		path: "/admin",
 		element: <AdminLayout />,
 		children: [
 			{
@@ -37,12 +43,11 @@ const router = createBrowserRouter([
 				element: <Calendar />,
 			},
 		],
-	
 	},
 	{
 		path: "/app",
 		element: <App />,
-	}
+	},
 ]);
 
 export default router;

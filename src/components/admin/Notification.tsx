@@ -1,8 +1,8 @@
 import { Button, MenuButton, MenuList, MenuItem, Menu, Skeleton, VStack, Box, Heading, Divider, IconButton, Tabs, TabList, TabPanels, Tab, TabPanel, Badge, Text, Flex } from "@chakra-ui/react";
 import { IoNotifications } from "react-icons/io5";
 import { BsThreeDots } from "react-icons/bs";
-import { useDeleteNotification, useGetNotifications, useMarkNotificationAsRead } from "../hooks/NotificationRepository";
-import { Notification as NotificationType } from "../entiies/Notification";
+import { useDeleteNotification, useGetNotifications, useMarkNotificationAsRead } from "../../hooks/NotificationRepository";
+import { Notification as NotificationType } from "../../entiies/Notification";
 import { useState, useMemo } from "react";
 import { TbBellRingingFilled } from "react-icons/tb";
 

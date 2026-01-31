@@ -21,9 +21,9 @@ import {
   VStack,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { useCreateEvent, useGetEvents } from "../../hooks/EventRepository";
-import { CreateEvent } from "../../entiies/Dto/CreateEvent";
-import { Event } from "../../entiies/Event";
+import { useCreateEvent, useGetEvents } from "../../../hooks/EventRepository";
+import { CreateEvent } from "../../../entiies/Dto/CreateEvent";
+import { Event } from "../../../entiies/Event";
 
 const Home = () => {
     // Get current time in Philippines timezone (Asia/Manila, UTC+8)
