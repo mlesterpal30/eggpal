@@ -8,11 +8,12 @@ import Inventory from "./components/admin/Inventory";
 import Finance from "./components/admin/Finance";
 import Calendar from "./components/admin/Calendar/Calendar";
 import Customer from "./components/customer/Customer";
+import Order from "./components/customer/Order";
 
 const router = createBrowserRouter([
 	{
 		path: "/",
-		element: <Customer />,
+		element: <Order />,
 	},
 	{
 		path: "/admin",
