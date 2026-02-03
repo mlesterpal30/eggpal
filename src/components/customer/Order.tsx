@@ -9,7 +9,6 @@ import {
   Input,
   FormControl,
   FormLabel,
-  FormHelperText,
   Tabs,
   TabList,
   TabPanels,
@@ -26,6 +25,8 @@ import { MdInfoOutline } from "react-icons/md";
 import { MdEgg as MdEggIcon } from "react-icons/md";
 
 import egglogo from "../../assets/egglogo.png";
+import { useLocationService } from "../../hooks/useLocationService";
+import DeliveryLocationUI from "./order/location/DeliveryLocationUI";
 
 const EGGS_PER_TRAY = 36;
 
@@ -41,6 +42,8 @@ const Order = () => {
 
   // Which tab is active: 0 = by tray, 1 = by pieces only
   const [activeTab, setActiveTab] = useState(0);
+
+  const location = useLocationService();
 
   const totalFromTray = trays * EGGS_PER_TRAY + extraPieces;
   const totalEggs = activeTab === 0 ? totalFromTray : piecesOnly;
@@ -64,6 +67,16 @@ const Order = () => {
       isClosable: true,
     });
     // TODO: send to cart/API
+  };
+
+  const handleMarkerDragEnd = () => {
+    toast({
+      title: "Location updated",
+      description: "Drag the pin to your exact house. We'll use this for delivery.",
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+    });
   };
 
   return (
@@ -105,6 +118,10 @@ const Order = () => {
         </Text>
       </Flex>
 
+      <DeliveryLocationUI location={location} onMarkerDragEnd={handleMarkerDragEnd} />
+
+      {/* Location map is in DeliveryLocationUI */}
+
       <Tabs
         variant="enclosed"
         colorScheme="blue"
@@ -130,7 +147,7 @@ const Order = () => {
                   borderColor="blue.100"
                 >
                   <Text fontSize="sm" color="gray.700">
-                    1 tray = {EGGS_PER_TRAY} eggs
+                    {EGGS_PER_TRAY} eggs
                   </Text>
                 </Box>
                 <HStack spacing={4}>
@@ -171,7 +188,7 @@ const Order = () => {
                   borderColor="blue.100"
                 >
                   <Text fontSize="sm" color="gray.700">
-                    Add eggs on top of trays 
+                    Add eggs on top of trays
                   </Text>
                 </Box>
                 <HStack spacing={4}>
@@ -248,7 +265,7 @@ const Order = () => {
                   borderColor="blue.100"
                 >
                   <Text fontSize="sm" color="gray.700">
-                    For orders under {EGGS_PER_TRAY} eggs or when you don’t need full trays
+                    For orders under {EGGS_PER_TRAY} eggs or when you don't need full trays
                   </Text>
                 </Box>
                 <HStack spacing={4}>
