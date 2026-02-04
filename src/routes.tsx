@@ -8,13 +8,25 @@ import Inventory from "./components/admin/Inventory";
 import Finance from "./components/admin/Finance";
 import Calendar from "./components/admin/Calendar/Calendar";
 import Customer from "./components/customer/Customer";
+import CustomerLayout from "./components/customer/CustomerLayout";
 import Order from "./components/customer/Order";
+import Profile from "./components/customer/Profile";
 import Location from "./components/customer/order/location/Location";
 
 const router = createBrowserRouter([
 	{
 		path: "/",
-		element: <Order />,
+		element: <CustomerLayout />,
+		children: [
+			{
+				index: true,
+				element: <Order />,
+			},
+			{
+				path: "profile",
+				element: <Profile />,
+			},
+		],
 	},
 	{
 		path: "/location",

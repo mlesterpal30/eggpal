@@ -77,7 +77,7 @@ const Order = () => {
   return (
     <Box maxW="md" mx="auto" p={6} fontFamily="geist">
       {/* Logo + EGGPAL FARM top left */}
-      <Flex align="center" gap={3} mb={6} mt={"-20px"} ml={"-20px"}>
+      {/* <Flex align="center" gap={3} mb={6} mt={"-20px"} ml={"-20px"}>
         <Box as="img" src={egglogo} alt="EggPal" w="20" h="20" objectFit="contain" flexShrink={0} />
         <VStack ml={"-24px"}>
             <Text fontFamily="rubik" fontSize="2xl" textColor={"blue.800"}> 
@@ -86,7 +86,7 @@ const Order = () => {
            
         </VStack>
      
-      </Flex>
+      </Flex> */}
 
       {/* ORDER EGGS with cart icon */}
       <HStack spacing={3} mb={3}>
@@ -171,8 +171,19 @@ const Order = () => {
           <TabPanel px={0}>
             <VStack align="stretch" spacing={6}>
               <FormControl>
-                <FormLabel>Trays</FormLabel>
-                <Box
+              <Box
+                  p={3}
+                  mb={3}
+                  bg="blue.50"
+                  borderRadius="md"
+                  borderWidth="1px"
+                  borderColor="blue.100"
+                >
+                   <Text fontSize="sm" color="gray.700">
+                    Trays
+                  </Text>
+                </Box>
+                {/* <Box
                   p={3}
                   mb={3}
                   bg="blue.50"
@@ -183,7 +194,7 @@ const Order = () => {
                   <Text fontSize="sm" color="gray.700">
                     {EGGS_PER_TRAY} eggs
                   </Text>
-                </Box>
+                </Box> */}
                 <HStack spacing={4}>
                   <IconButton
                     aria-label="Remove tray"
@@ -212,8 +223,19 @@ const Order = () => {
               </FormControl>
 
               <FormControl>
-                <FormLabel>Extra pieces</FormLabel>
                 <Box
+                  p={3}
+                  mb={3}
+                  bg="blue.50"
+                  borderRadius="md"
+                  borderWidth="1px"
+                  borderColor="blue.100"
+                >
+                  <Text fontSize="sm" color="gray.700">
+                    Extra pieces
+                  </Text>
+                </Box>
+                {/* <Box
                   p={3}
                   mb={3}
                   bg="blue.50"
@@ -224,7 +246,7 @@ const Order = () => {
                   <Text fontSize="sm" color="gray.700">
                     Add eggs on top of trays
                   </Text>
-                </Box>
+                </Box> */}
                 <HStack spacing={4}>
                   <IconButton
                     aria-label="Remove piece"
