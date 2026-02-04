@@ -13,7 +13,8 @@ import Order from "./components/customer/Order";
 import Profile from "./components/customer/Profile";
 import Location from "./components/customer/order/location/Location";
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+	[
 	{
 		path: "/",
 		element: <CustomerLayout />,
@@ -66,6 +67,8 @@ const router = createBrowserRouter([
 		path: "/app",
 		element: <App />,
 	},
-]);
+	],
+	{ basename: import.meta.env.BASE_URL.replace(/\/$/, "") }
+);
 
 export default router;
