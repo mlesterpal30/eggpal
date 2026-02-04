@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Text,
@@ -23,15 +24,17 @@ import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import { BsCart3 } from "react-icons/bs";
 import { MdInfoOutline } from "react-icons/md";
 import { MdEgg as MdEggIcon } from "react-icons/md";
+import { MdMyLocation, MdLocationOn } from "react-icons/md";
 
 import egglogo from "../../assets/egglogo.png";
-import { useLocationService } from "../../hooks/useLocationService";
-import DeliveryLocationUI from "./order/location/DeliveryLocationUI";
+import { useLocationStore } from "../../store/locationStore";
 
 const EGGS_PER_TRAY = 36;
 
 const Order = () => {
+  const navigate = useNavigate();
   const toast = useToast();
+  const { locationAddress, locationCoords } = useLocationStore();
 
   // By tray + pieces
   const [trays, setTrays] = useState(0);
@@ -42,8 +45,6 @@ const Order = () => {
 
   // Which tab is active: 0 = by tray, 1 = by pieces only
   const [activeTab, setActiveTab] = useState(0);
-
-  const location = useLocationService();
 
   const totalFromTray = trays * EGGS_PER_TRAY + extraPieces;
   const totalEggs = activeTab === 0 ? totalFromTray : piecesOnly;
@@ -69,14 +70,8 @@ const Order = () => {
     // TODO: send to cart/API
   };
 
-  const handleMarkerDragEnd = () => {
-    toast({
-      title: "Location updated",
-      description: "Drag the pin to your exact house. We'll use this for delivery.",
-      status: "success",
-      duration: 2000,
-      isClosable: true,
-    });
+  const handleLocationClick = () => {
+    navigate("/location");
   };
 
   return (
@@ -118,9 +113,48 @@ const Order = () => {
         </Text>
       </Flex>
 
-      <DeliveryLocationUI location={location} onMarkerDragEnd={handleMarkerDragEnd} />
-
-      {/* Location map is in DeliveryLocationUI */}
+      {/* Location selection */}
+      <FormControl mb={4}>
+        <FormLabel>Delivery location</FormLabel>
+        {locationCoords && locationAddress ? (
+          <Box
+            p={4}
+            bg="blue.50"
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="blue.200"
+          >
+            <HStack justify="space-between" align="flex-start">
+              <HStack align="flex-start" spacing={2} flex={1}>
+                <Box as={MdLocationOn} fontSize="xl" color="blue.600" mt="2px" flexShrink={0} />
+                <Text fontSize="sm" color="gray.700" flex={1}>
+                  {locationAddress}
+                </Text>
+              </HStack>
+              <Button
+                size="sm"
+                variant="outline"
+                colorScheme="blue"
+                onClick={handleLocationClick}
+                ml={2}
+                flexShrink={0}
+              >
+                Change
+              </Button>
+            </HStack>
+          </Box>
+        ) : (
+          <Button
+            leftIcon={<Box as={MdMyLocation} fontSize="lg" />}
+            colorScheme="blue"
+            variant="outline"
+            w="full"
+            onClick={handleLocationClick}
+          >
+            Pick my location
+          </Button>
+        )}
+      </FormControl>
 
       <Tabs
         variant="enclosed"

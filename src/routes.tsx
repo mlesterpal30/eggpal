@@ -9,11 +9,16 @@ import Finance from "./components/admin/Finance";
 import Calendar from "./components/admin/Calendar/Calendar";
 import Customer from "./components/customer/Customer";
 import Order from "./components/customer/Order";
+import Location from "./components/customer/order/location/Location";
 
 const router = createBrowserRouter([
 	{
 		path: "/",
 		element: <Order />,
+	},
+	{
+		path: "/location",
+		element: <Location />,
 	},
 	{
 		path: "/admin",
