@@ -27,7 +27,8 @@ import { MdEgg as MdEggIcon } from "react-icons/md";
 import { MdMyLocation, MdLocationOn } from "react-icons/md";
 
 import egglogo from "../../assets/egglogo.png";
-import { useLocationStore } from "../../store/locationStore";
+import { useLocationStore } from "../../../../store/locationStore";
+import { useCreateOrder } from "../../../../hooks/OrderRepository";
 
 const EGGS_PER_TRAY = 36;
 
@@ -35,6 +36,7 @@ const Order = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const { locationAddress, locationCoords } = useLocationStore();
+  const createOrder = useCreateOrder();
 
   // By tray + pieces
   const [trays, setTrays] = useState(0);
@@ -49,7 +51,20 @@ const Order = () => {
   const totalFromTray = trays * EGGS_PER_TRAY + extraPieces;
   const totalEggs = activeTab === 0 ? totalFromTray : piecesOnly;
 
+  const canAddToOrder =
+    Boolean(locationAddress?.trim()) && totalEggs > 0 && !createOrder.isPending;
+
   const handleAddToOrder = () => {
+    if (!locationAddress?.trim()) {
+      toast({
+        title: "Location required",
+        description: "Pick your delivery location first.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
     if (totalEggs <= 0) {
       toast({
         title: "No eggs selected",
@@ -60,14 +75,32 @@ const Order = () => {
       });
       return;
     }
-    toast({
-      title: "Added to order",
-      description: `${totalEggs} egg${totalEggs !== 1 ? "s" : ""} added.`,
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
-    // TODO: send to cart/API
+    createOrder.mutate(
+      {
+        customerLocation: locationAddress.trim(),
+        quantity: totalEggs,
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Added to order",
+            description: `${totalEggs} egg${totalEggs !== 1 ? "s" : ""} added.`,
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: "Order failed",
+            description: error.message || "Could not add to order. Try again.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+        },
+      }
+    );
   };
 
   const handleLocationClick = () => {
@@ -393,7 +426,9 @@ const Order = () => {
           size="lg"
           w="full"
           onClick={handleAddToOrder}
-          isDisabled={totalEggs <= 0}
+          isDisabled={!canAddToOrder}
+          isLoading={createOrder.isPending}
+          loadingText="Adding..."
         >
           Add to order
         </Button>

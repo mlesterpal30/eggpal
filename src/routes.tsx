@@ -9,7 +9,7 @@ import Finance from "./components/admin/Finance";
 import Calendar from "./components/admin/Calendar/Calendar";
 import Customer from "./components/customer/Customer";
 import CustomerLayout from "./components/customer/CustomerLayout";
-import Order from "./components/customer/Order";
+import Order from "./components/customer/order/location/Order";
 import Profile from "./components/customer/Profile";
 import Location from "./components/customer/order/location/Location";
 
